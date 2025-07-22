@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChipsMe Profit Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #fff8f0;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      width: 100%;
+    }
+    .calculator {
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      color: #f57c00;
+    }
+    label, select, input {
+      display: block;
+      margin: 15px auto;
+      width: 100%;
+      max-width: 300px;
+    }
+    button {
+      background: #f57c00;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #388e3c;
+    }
+    .note {
+      margin-top: 30px;
+      font-size: 0.95em;
+      background-color: #fff3e0;
+      padding: 15px;
+      border-left: 5px solid #f57c00;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="calculator">
+      <h1>ChipsMe Profit Calculator</h1>
+
+      <!-- Role selection dropdown -->
+      <label for="role">Choose your role:</label>
+      <select id="role" onchange="updateInputLabel()">
+        <option value="seller">ChipsMe Seller</option>
+        <option value="partner">ChipsMe Sleeping Partner</option>
+      </select>
+
+      <!-- Input label that changes dynamically based on role -->
+      <label id="input-label" for="input">Number of packages sold:</label>
+      <input type="number" id="input" min="0" />
+
+      <!-- Calculate button -->
+      <button onclick="calculateProfit()">Calculate Profit</button>
+
+      <!-- Area to display result -->
+      <div class="result" id="result"></div>
+
+      <!-- Informational note about minimum profits -->
+      <div class="note">
+        📌 <strong>Minimum Rough Profit:</strong><br>
+        - ChipsMe Seller: 6,000 FCFA per week<br>
+        - ChipsMe Sleeping Partner: 3,000 FCFA per week
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Function to update input label text depending on selected role
+    function updateInputLabel() {
+      const role = document.getElementById("role").value;
+      const label = document.getElementById("input-label");
+      // Change label based on whether user is seller or partner
+      label.textContent = role === "seller" ? "Number of packages sold:" : "Number of customers referred:";
+    }
+
+    // Function to calculate profit based on user input and role
+    function calculateProfit() {
+      const role = document.getElementById("role").value;
+      const input = parseInt(document.getElementById("input").value);
+      let result = 0;
+
+      // Handle invalid input
+      if (isNaN(input) || input < 0) {
+        document.getElementById("result").textContent = "Please enter a valid number.";
+        return;
+      }
+
+      // Logic for seller role: each package sold = 500 FCFA
+      if (role === "seller") {
+        result = input * 500;
+        document.getElementById("result").textContent = `As a ChipsMe Seller, you earn ${result.toLocaleString()} FCFA.`;
+      }
+      // Logic for partner role: each customer referred = 250 FCFA
+      else if (role === "partner") {
+        result = input * 250;
+        document.getElementById("result").textContent = `As a Sleeping Partner, you earn ${result.toLocaleString()} FCFA.`;
+      }
+    }
+  </script>
+</body>
+</html>
