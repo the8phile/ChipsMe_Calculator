@@ -52,6 +52,48 @@
       border-left: 5px solid #f57c00;
       text-align: left;
     }
+
+    /* Loading overlay shown while the "calculation" is processing */
+    .loading-overlay {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin: 20px auto;
+    }
+    .loading-overlay.active {
+      display: flex;
+    }
+    /* Spinning chip built from CSS only, so it never depends on an image asset that could go missing */
+    .chip-spinner {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background:
+        repeating-conic-gradient(#f57c00 0deg 30deg, #ffcc80 30deg 60deg);
+      position: relative;
+      animation: spin 1s linear infinite;
+      box-shadow: 0 0 0 4px #fff8f0, 0 0 0 6px #f57c00;
+    }
+    .chip-spinner::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff8f0;
+      transform: translate(-50%, -50%);
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loading-text {
+      color: #f57c00;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -71,7 +113,13 @@
       <input type="number" id="input" min="0" />
 
       <!-- Calculate button -->
-      <button onclick="calculateProfit()">Calculate Profit</button>
+      <button id="calc-btn" onclick="calculateProfit()">Calculate Profit</button>
+
+      <!-- Loading animation shown while the result is being computed -->
+      <div class="loading-overlay" id="loading-overlay">
+        <div class="chip-spinner"></div>
+        <div class="loading-text">Calculating...</div>
+      </div>
 
       <!-- Area to display result -->
       <div class="result" id="result"></div>
@@ -98,24 +146,39 @@
     function calculateProfit() {
       const role = document.getElementById("role").value;
       const input = parseInt(document.getElementById("input").value);
-      let result = 0;
+      const resultEl = document.getElementById("result");
+      const overlay = document.getElementById("loading-overlay");
+      const button = document.getElementById("calc-btn");
 
       // Handle invalid input
       if (isNaN(input) || input < 0) {
-        document.getElementById("result").textContent = "Please enter a valid number.";
+        resultEl.textContent = "Please enter a valid number.";
         return;
       }
 
-      // Logic for seller role: each package sold = 500 FCFA
-      if (role === "seller") {
-        result = input * 500;
-        document.getElementById("result").textContent = `As a ChipsMe Seller, you earn ${result.toLocaleString()} FCFA.`;
-      }
-      // Logic for partner role: each customer referred = 250 FCFA
-      else if (role === "partner") {
-        result = input * 250;
-        document.getElementById("result").textContent = `As a Sleeping Partner, you earn ${result.toLocaleString()} FCFA.`;
-      }
+      // Show the loading animation and hide any previous result while "processing"
+      resultEl.textContent = "";
+      overlay.classList.add("active");
+      button.disabled = true;
+
+      setTimeout(() => {
+        let result = 0;
+
+        // Logic for seller role: each package sold = 500 FCFA
+        if (role === "seller") {
+          result = input * 500;
+          resultEl.textContent = `As a ChipsMe Seller, you earn ${result.toLocaleString()} FCFA.`;
+        }
+        // Logic for partner role: each customer referred = 250 FCFA
+        else if (role === "partner") {
+          result = input * 250;
+          resultEl.textContent = `As a Sleeping Partner, you earn ${result.toLocaleString()} FCFA.`;
+        }
+
+        // Hide the loading animation once the result is ready
+        overlay.classList.remove("active");
+        button.disabled = false;
+      }, 900);
     }
   </script>
 </body>
